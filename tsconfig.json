@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "module": "nodenext",
+        "target": "esnext",
+        "sourceMap": true,
+        "outDir": "dist",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "nodenext",
+        "strict": true,            
+        "declaration": false,                          
+        "skipLibCheck": true,
+        "types": ["@webgpu/types", "@types/node"],
+        //"lib": ["ES2022", "DOM"]
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}
+
+
+/*  npm install @webgpu/types
+    npm install typescript ts-loader
+    npm install @types/node
+    npm install typegpu */
