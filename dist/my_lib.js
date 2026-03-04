@@ -1,4 +1,4 @@
-export async function setupWebGPU(canvas_id) {
+export async function initWebGPU(canvas_id) {
     /* GPU */
     const adapter = await navigator.gpu?.requestAdapter();
     /* "device" */
@@ -29,7 +29,7 @@ export async function createShaderModuleFromSource(device, shader_source_relativ
 }
 export async function runSimpleRenderProgram(canvas_id, module_relative_path, name_of_shader_program) {
     /* Retrieve graphical and WebGPU stuff */
-    const { device, canvas, context, presentationFormat } = await setupWebGPU(canvas_id);
+    const { device, canvas, context, presentationFormat } = await initWebGPU(canvas_id);
     /* Setup shader module */
     const rgbTriangleShaderModule = await createShaderModuleFromSource(device, `../src/shaders/${module_relative_path}.wgsl`, `${name_of_shader_program}-shader-module`);
     /* Setup render pipeline */
@@ -83,6 +83,38 @@ export async function runSimpleRenderProgram(canvas_id, module_relative_path, na
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
     }
+}
+export function createRectangle(length, width) {
+    return new Float32Array([
+        -width / 2.0, -length / 2.0,
+        width / 2.0, -length / 2.0,
+        width / 2.0, length / 2.0,
+        -width / 2.0, -length / 2.0,
+        -width / 2.0, length / 2.0,
+        width / 2.0, length / 2.0,
+    ]);
+}
+export function createNGon(radius, n) {
+    var nGonVertices = [];
+    for (let i = 0; i < n; i++) {
+        let angle = 2 * Math.PI * i / n;
+        let x = Math.cos(angle) * radius;
+        let y = Math.sin(angle) * radius;
+        nGonVertices.push([x, y]);
+    }
+    const triangulationVertices = new Float32Array(3 * 2 * n);
+    var j = 0;
+    for (let i = 0; i < n; i++) {
+        triangulationVertices.set(nGonVertices[i], j);
+        triangulationVertices.set(nGonVertices[(i + 1) % n], j + 2);
+        triangulationVertices.set([0.0, 0.0], j + 4);
+        j += 6;
+    }
+    return triangulationVertices;
+}
+export function clamp(min, max, val) {
+    return Math.min(max, Math.max(min, val));
+    // clamp(-1, 1, 0) = min(1, max(-1, 0) ) = 0
 }
 /*
 const observer = new ResizeObserver(entries => {
